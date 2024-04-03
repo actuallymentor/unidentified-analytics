@@ -16,7 +16,7 @@ Useful for low-stakes analytics in hobby projects, from README.md files to comma
 
 ```bash
 # Choose a random namespace for your app
-app_namespace="mental-finger-difference-within"
+app_namespace="make-something-up-anything-works"
 
 # Call the endpoint
 curl "https://unidentifiedanalytics.web.app/touch/?namespace=$app_namespace"
@@ -24,31 +24,31 @@ curl "https://unidentifiedanalytics.web.app/touch/?namespace=$app_namespace"
 # OR call the endpoint silently and in the background
 nohup curl "https://unidentifiedanalytics.web.app/touch/?namespace=$app_namespace" > /dev/null 2>&1
 
-# Stats at: https://unidentifiedanalytics.web.app/#/stats/mental-finger-difference-within
+# Stats at: https://unidentifiedanalytics.web.app/stats/make-something-up-anything-works
 ```
 
 **Markdown:**
 
 ```markdown
 // Load the tracking url as an image on any markdown document
-![Privacy friendly user statistics pixel](https://unidentifiedanalytics.web.app/touch/?namespace=anything-you-choose)
+![Privacy friendly user statistics pixel](https://unidentifiedanalytics.web.app/touch/?make-something-up-anything-works)
 
 // Load the tracking url as an image on any page
-<img style="display: none;" src="https://unidentifiedanalytics.web.app/touch/?namespace=anything-you-choose" />
+<img style="display: none;" src="https://unidentifiedanalytics.web.app/touch/?make-something-up-anything-works" />
 
-// Stats at: https://unidentifiedanalytics.web.app/#/stats/anything-you-choose
+// Stats at: https://unidentifiedanalytics.web.app/stats/make-something-up-anything-works
 ```
 
 **Javascript:**
 
 ```javascript
 // Choose a random namespace for your app
-const app_namespace="mental-finger-difference-within"
+const app_namespace="make-something-up-anything-works"
 
 // Call the endpoint
 await fetch( `https://unidentifiedanalytics.web.app/touch/?namespace=${ app_namespace }` )
 
-// Stats at: https://unidentifiedanalytics.web.app/#/stats/mental-finger-difference-within
+// Stats at: https://unidentifiedanalytics.web.app/stats/make-something-up-anything-works
 ```
 
 **React:**
@@ -57,7 +57,7 @@ await fetch( `https://unidentifiedanalytics.web.app/touch/?namespace=${ app_name
 import { useEffect } from 'react'
 
 useEffect( () => {
-    const namespace = 'make-something-up'
+    const namespace = 'make-something-up-anything-works'
     fetch( `https://unidentifiedanalytics.web.app/touch/?namespace=${namespace}`, { mode: 'no-cors' } )
 }, [] )
 ``
