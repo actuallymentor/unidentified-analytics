@@ -1,3 +1,11 @@
+/**
+ * Retrieves historical statistics for a given namespace.
+ * @param {Object} options - The options object.
+ * @param {Object} options.data - The data object containing the namespace.
+ * @param {string} options.data.namespace - The namespace for which to retrieve the historical statistics.
+ * @returns {Promise<Object>} - A promise that resolves to the historical statistics object.
+ * @returns {Object[]} returns.history - An array of historical statistics objects.
+ */
 export async function get_historical_stats( { data } ) {
 
     try {

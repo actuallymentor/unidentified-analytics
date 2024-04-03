@@ -1,10 +1,16 @@
 
 
-const empty_svg = comment => `<svg width="1" height="1" viewBox="0 0 1 1" fill="none" xmlns="http://www.w3.org/2000/svg"><!-- ${ comment } --></svg>`
+/**
+ * Registers a touch event and saves the IP address in the database.
+ * @param {Object} request - The request object.
+ * @param {Object} response - The response object.
+ * @returns {Promise<void>} - A promise that resolves when the touch event is registered.
+ */
 export async function register_touch( request, response ) {
 
     let { ip: request_ip, ips, query: { namespace } } = request
     const ip = request_ip || ips[0] || request.get( 'x-forwarded-for' )
+    const empty_svg = comment => `<svg width="1" height="1" viewBox="0 0 1 1" fill="none" xmlns="http://www.w3.org/2000/svg"><!-- ${ comment } --></svg>`
 
     try {
 
@@ -39,6 +45,11 @@ export async function register_touch( request, response ) {
 
 }
 
+/**
+ * Collates touch count and updates tracking and daily statistics.
+ * @param {Object} event - The event object.
+ * @returns {Promise<void>} - A promise that resolves when the touch count is updated.
+ */
 export async function collate_touch_count( event ) {
 
     try {
