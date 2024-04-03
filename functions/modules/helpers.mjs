@@ -1,11 +1,17 @@
-export const dev = !!process.env.development
+export const dev = process.env.NODE_ENV === 'development'
+export const emulator = process.env.FUNCTIONS_EMULATOR === 'true'
+export const verbose = process.env.VERBOSE === 'true'
 
 /**
  * Logs the provided comments to the console if the `dev` flag is set or the `VERBOSE` environment variable is truthy.
  * @param {...any} comments - The comments to be logged.
  */
 export const log = ( ...comments ) => {
-    if( dev || process.env.VERBOSE ) console.log( ...comments )
+    let reason = ''
+    if( dev ) reason = '[dev] '
+    if( emulator ) reason = '[emulator] '
+    if( verbose ) reason = '[verbose] '
+    if( dev || verbose || emulator ) console.log( reason, ...comments )
 }
 
 /**

@@ -24,7 +24,10 @@ export async function get_historical_stats( { data } ) {
         const namespace_stats = await db().collection( `historical_stats` ).doc( namespace ).get().then( snap => dataFromSnap( snap, false ) )
 
         // Check if data is fresh
-        if( namespace_stats?.updated >= refresh_timestamp ) return namespace_stats
+        if( namespace_stats?.updated >= refresh_timestamp ) {
+            log( `Data is fresh, returning cache` )
+            return namespace_stats
+        }
 
         // If data is not fresh, update and return
         let last_days_of_data = await db().collection( `daily_statistics` ).where( 'namespace', '==', namespace ).orderBy( 'updated', 'desc' ).limit( history_length ).get().then( dataFromSnap )
