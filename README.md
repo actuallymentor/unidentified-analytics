@@ -10,7 +10,7 @@ The most basic tracking you have ever seen:
 
 Useful for low-stakes analytics in hobby projects, from README.md files to command lines to webapps.
 
-[Click here to open Unidentifiec Analytics](https://unidentifiedanalytics.web.app/).
+[Click here to open Unidentified Analytics](https://unidentifiedanalytics.web.app/).
 
 ## Example usage:
 
