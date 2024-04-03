@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "default": "unidentifiedanalytics",
+    "production": "unidentifiedanalytics"
+  }
+}
