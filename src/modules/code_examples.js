@@ -40,4 +40,4 @@ useEffect( () => {
 }, [] )
 `.trim()
 
-export const unan_namespace = 'unidentified-analytics-website'
+export const unan_namespace = 'unidentified-analytics-website-data'
