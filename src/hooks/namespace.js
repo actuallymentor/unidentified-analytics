@@ -32,7 +32,8 @@ export const useStatsOfNamespace= ( namespace ) => {
 export const useHistoricalStatsOfNamespace = ( namespace ) => {
 
     const [ cached_stats, set_cached_stats ] = useState(  )
-    const [ stats, set_stats ] = useState(  )
+    const [ stats, set_stats ] = useState()
+    const [ source, set_source ] = useState( 'cache' )  
 
     useEffect( () => listen_to_document( `historical_stats`, namespace, cached_historical_data => {
         cached_historical_data?.history.sort( sort_by_updated_asc )
@@ -55,10 +56,13 @@ export const useHistoricalStatsOfNamespace = ( namespace ) => {
                 const cache_is_up_to_date = historical_stats?.updated == cached_stats?.updated
                 if( cache_is_up_to_date ) log( `Cache is as recent as received stats, keeping cache: `, cached_stats )
                 else log( `Cache out of date, setting updated historical data: `, historical_stats )
-                if( !cancelled && !cache_is_up_to_date ) set_stats( historical_stats )
+                if( cancelled || cache_is_up_to_date ) return
+                set_stats( historical_stats )
     
             } catch ( e ) {
                 log( `Error getting historical stats: `, e )
+            } finally {
+                set_source( 'live' )
             }
     
         } )( )
@@ -67,7 +71,10 @@ export const useHistoricalStatsOfNamespace = ( namespace ) => {
     
     }, [ namespace ] )
 
-    return stats || cached_stats
+    return {
+        stats: stats || cached_stats,
+        source
+    }
 
 }
 

@@ -15,7 +15,7 @@ export default function Stats() {
 
     const { namespace } = useParams()
     const stats = useStatsOfNamespace( namespace )
-    const historical_stats = useHistoricalStatsOfNamespace( namespace )
+    const { stats: historical_stats, source } = useHistoricalStatsOfNamespace( namespace )
     
     useEffect( () => {
         document.title = `${ capitalise( namespace ) }'s Unidentified Analytics`
@@ -42,6 +42,10 @@ export default function Stats() {
 
                 <Suspense fallback={ <Spinner /> }>
                     { historical_stats && <HistoryChart historical_stats={ historical_stats } /> }
+                    { source == 'cache' && <Sidenote>
+                        <Spinner margin="0 .5rem 0" size={ 10 } />
+                        Updating historical data...
+                    </Sidenote>}
                 </Suspense>
 
 

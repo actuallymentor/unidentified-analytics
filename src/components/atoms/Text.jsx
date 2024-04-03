@@ -60,6 +60,9 @@ export const Sidenote = styled.p`
 	text-align: left;
 	overflow-wrap: anywhere;
 	font-size: ${ ( { size='.7rem' } ) => size };
+	display: flex;
+	align-items: center;
+	justify-content: ${ ( { justify='flex-start' } ) => justify };
 `
 
 export const Br = styled.span`
