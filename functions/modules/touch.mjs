@@ -1,5 +1,3 @@
-
-
 /**
  * Registers a touch event and saves the IP address in the database.
  * @param {Object} request - The request object.
@@ -9,24 +7,28 @@
 export async function register_touch( request, response ) {
 
     let { ip: request_ip, ips, query: { namespace } } = request
-    const ip = request_ip || ips[0] || request.get( 'x-forwarded-for' )
+    let ip = request_ip || ips[0] || request.get( 'x-forwarded-for' )
     const empty_svg = comment => `<svg width="1" height="1" viewBox="0 0 1 1" fill="none" xmlns="http://www.w3.org/2000/svg"><!-- ${ comment } --></svg>`
 
     try {
 
         // Import function dependencies
         const { db } = await import( './firebase.mjs' )
-        const { log } = await import( './helpers.mjs' )
 
         // Get ip from touch 
         if( !namespace ) return response.status( 400 ).send( 'missing namespace' )
-        namespace = `${ namespace }`.toLocaleLowerCase()
+        namespace = `${ namespace }`.toLowerCase()
 
-        // Guess the ip with some fallbacks
-        if( !request_ip ) log( 'Ips: ', request_ip, ips[0], request.get( 'x-forwarded-for' ) )
+        // Hash the ip into a sha256
+        const { createHash } = await import( 'crypto' )
+        ip = createHash( 'sha256' ).update( ip ).digest( 'hex' )
+
+        // Dev only debug trace
+        // const { log } = await import( './helpers.mjs' )
+        // if( !request_ip ) log( 'Ips: ', request_ip, ips[0], request.get( 'x-forwarded-for' ) )
 
         // Register touch in backend
-        await db().collection( `touches` ).add( {
+        await db().collection( `hashed_touches` ).add( {
             ip,
             updated: Date.now(),
             updated_human: new Date().toString(),
@@ -64,7 +66,7 @@ export async function collate_touch_count( event ) {
         const { ip, namespace } = dataFromSnap( event.data )
 
         // Check if this is the first touch of this ip
-        const touches = await db().collection( `touches` ).where( 'ip', '==', ip ).where( 'namespace', '==', namespace ).limit( 2 ).get().then( dataFromSnap )
+        const touches = await db().collection( `hashed_touches` ).where( 'ip', '==', ip ).where( 'namespace', '==', namespace ).limit( 2 ).get().then( dataFromSnap )
         const is_first_touch_of_ip = touches?.length == 1
         log( `This ${ namespace } touch ${ is_first_touch_of_ip ? 'is' : 'is not' } the first of this ip` )
 

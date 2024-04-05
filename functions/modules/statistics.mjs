@@ -58,3 +58,77 @@ export async function get_historical_stats( { data } ) {
     }
 
 }
+
+/**
+ * Migrates IP data to hashed data.
+ * @returns {Promise<void>} - A promise that resolves when the migration is complete.
+ */
+export async function migrate_ip_data_to_hashed_data( { data } ) {
+
+    // Load all touches
+    const { db, dataFromSnap } = await import( './firebase.mjs' )
+    const { log, emulator, wait } = await import( './helpers.mjs' )
+    const { createHash } = await import( 'crypto' )
+    const start = Date.now()
+
+    // if this is not a dev environment, return
+    if( !emulator ) {
+        log( `This function can only be run in a development environment` )
+        return
+    }
+
+    // Get all touches
+    let touches = await db().collection( `touches` ).get().then( dataFromSnap )
+    log( `Got ${ touches?.length } touches` )
+
+    // Filter out touches that have already been migrated
+    touches = touches.filter( touch => !touch.migrated )
+    log( `Filtered out ${ touches?.length } touches that need to be migrated` )
+
+    // Map over the touches and hash the ip
+    const hashed_touches = touches.map( touch => {
+        const { ip, ...rest } = touch
+        return {
+            ...rest,
+            ip: createHash( 'sha256' ).update( ip ).digest( 'hex' )
+        }
+    } )
+    log( `Hashed ${ hashed_touches?.length } touches, exerpt:`, hashed_touches.slice( 0, 1 ) )
+
+    // Split the touches into chunks of 500
+    const chunk_size = 500
+    const chunks = []
+    for( let i = 0; i < hashed_touches.length; i += chunk_size ) {
+        chunks.push( hashed_touches.slice( i, i + chunk_size ) )
+    }
+    log( `Split touches into ${ chunks.length } chunks` )
+
+    // Loop over the chunks, and promise.all write them to firestore
+    let total_written = 0
+    for( const chunk of chunks ) {
+
+        // Write the chunk and mark the touch as migrated
+        const queue = () => chunk.map( ( { id, ...touch } ) => Promise.all( [
+            db().collection( 'hashed_touches' ).doc( id ).set( touch ),
+            db().collection( 'touches' ).doc( id ).set( { migrated: true }, { merge: true } )
+        ] ) )
+
+        // Write the chunk with a very naive retry mechanism to work around firebase limits
+        await Promise.all( queue() ).catch( async e => {
+            // Trying again, but waiting for 10 seconds
+            log( `Error writing chunk, waiting 10 seconds before retrying` )
+            await wait( 10000 )
+            await Promise.all( queue() )
+        } ).catch( async e => {
+            // Trying again, but waiting for 30 seconds
+            log( `Error writing chunk, waiting 10 seconds before retrying` )
+            await wait( 30000 )
+            await Promise.all( queue() )
+        } ).catch( e => log( `Error writing chunk: `, e ) )
+
+        total_written += chunk.length
+        const seconds_elapsed = ( Date.now() - start ) / 1000
+        log( `Wrote chunk of ${ chunk.length } touches, progress: ${ Math.round( total_written / hashed_touches.length * 100 ) }% in ${ seconds_elapsed } seconds` )
+    }
+
+}
